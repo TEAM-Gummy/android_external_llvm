@@ -199,6 +199,11 @@ static unsigned inBytes(unsigned Bits) {
   return Bits / 8;
 }
 
+// GCC 4.8 miscompiles this function under O2, resulting in a SIGBUS
+#if (__GNUC__ == 4 && __GNUC_MINOR__ == 8)
+#pragma GCC push_options
+#pragma GCC optimize("Os")
+#endif
 void DataLayout::parseSpecifier(StringRef Desc) {
   while (!Desc.empty()) {
     // Split at '-'.
@@ -300,6 +305,9 @@ void DataLayout::parseSpecifier(StringRef Desc) {
     }
   }
 }
+#if (__GNUC__ == 4 && __GNUC_MINOR__ == 8)
+#pragma GCC pop_options
+#endif
 
 /// Default ctor.
 ///
